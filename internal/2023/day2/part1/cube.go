@@ -1,4 +1,4 @@
-package main
+package day2part1
 
 import (
 	"bufio"
@@ -13,40 +13,57 @@ type Counts struct {
 	blue  int
 }
 
-func parseCount(str string, counts *Counts) {
+func getMaxCubes() Counts {
+	maxCubes := Counts{}
+	maxCubes.red = 12
+	maxCubes.green = 13
+	maxCubes.blue = 14
+	return maxCubes
+}
+
+func parseAndVerifySingularCount(str string) bool {
+	counts := Counts{}
 	trimmed := strings.Trim(str, "\n\t\r ")
 	parts := strings.Split(trimmed, " ")
 	if len(parts) != 2 {
 		println(str)
-		panic("Must Include 2 parts")
+		println("Must Include 2 parts")
+		return true
 	}
 	count, _ := strconv.Atoi(parts[0])
 	color := parts[1]
-	if color == "red" && count > counts.red {
-		counts.red = count
+	if color == "red" {
+		counts.red += count
 	}
-	if color == "blue" && count > counts.blue {
-		counts.blue = count
+	if color == "blue" {
+		counts.blue += count
 	}
-	if color == "green" && count > counts.green {
-		counts.green = count
+	if color == "green" {
+		counts.green += count
 	}
+	max := getMaxCubes()
+	if counts.red > max.red || counts.green > max.green || counts.blue > max.blue {
+		return false
+	}
+	return true
 }
 
 // hande a line like below
 // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-func multLines(str string) int {
+func verifyLine(str string) bool {
 	strs := strings.Split(str, ":")
 	scoreStrs := strs[len(strs)-1]
 	splitFunc := func(c rune) bool {
 		return c == ',' || c == ';'
 	}
-	count := Counts{}
 	pullStrs := strings.FieldsFunc(scoreStrs, splitFunc)
 	for _, pullStr := range pullStrs {
-		parseCount(pullStr, &count)
+		result := parseAndVerifySingularCount(pullStr)
+		if !result {
+			return false
+		}
 	}
-	return count.red * count.green * count.blue
+	return true
 }
 
 func readUntilEmpty() []string {
@@ -66,9 +83,14 @@ func readUntilEmpty() []string {
 
 func main() {
 	lines := readUntilEmpty()
-	sum := 0
-	for _, line := range lines {
-		sum += multLines(line)
+	workCount := 0
+	for index, line := range lines {
+		result := verifyLine(line)
+		if result {
+			workCount += index + 1
+		} else {
+			println("Fail ", index+1)
+		}
 	}
-	println(sum)
+	println(workCount)
 }
