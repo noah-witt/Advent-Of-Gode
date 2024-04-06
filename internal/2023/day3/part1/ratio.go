@@ -5,10 +5,11 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 func isSymbol(c byte) bool {
-	return c == '*' || c == '#' || c == '+' || c == '$'
+	return c != '.' && (unicode.IsSymbol(rune(c)) || unicode.IsPunct(rune(c)))
 }
 
 func isNumber(c byte) bool {
@@ -36,7 +37,7 @@ func prevNewline(characters []byte, pointer int) int {
 		}
 		pointer--
 	}
-	return 0
+	return -1
 }
 
 func findEndPtr(characters []byte, pointer int) int {
@@ -71,9 +72,9 @@ func isAdjacentToSymbol(characters []byte, pointer int) bool {
 	if prevNewLinePointer > 0 {
 		// pointer is not pointing to first line so we can go back home more newline
 		startOfPrevLine := prevNewline(characters, prevNewLinePointer-1)
-		pointerAbove := startOfPrevLine + charsFromStartOfLine - 1
+		pointerAbove := startOfPrevLine + charsFromStartOfLine
 		// check line above 1 row
-		println("Checking", string(characters[pointerAbove]), " ", string(characters[pointerAbove+1]), " and ", string(characters[pointerAbove-1]))
+		// println("Checking", string(characters[pointerAbove]), " ", string(characters[pointerAbove+1]), " and ", string(characters[pointerAbove-1]))
 		if isSymbol(characters[pointerAbove]) {
 			return true
 		}
@@ -89,13 +90,13 @@ func isAdjacentToSymbol(characters []byte, pointer int) bool {
 	startNextLine := nextNewline(characters, pointer)
 	pointerBelow := startNextLine + charsFromStartOfLine
 	// line up with line below
-	if startNextLine > 0 && pointerBelow < len(characters) {
+	if startNextLine > 0 {
 		// check below
-		if isSymbol(characters[pointerBelow]) {
+		if pointerBelow < len(characters) && isSymbol(characters[pointerBelow]) {
 			return true
 		}
 		// check below -1 for diagonals
-		if isSymbol(characters[pointerBelow-1]) {
+		if pointerBelow-1 < len(characters) && isSymbol(characters[pointerBelow-1]) {
 			return true
 		}
 		// check below +1 for diagonals
@@ -176,7 +177,7 @@ func convertStr(strs []string) string {
 	return result
 }
 
-func day3part1() {
+func main() {
 	strs := readUntilEmpty()
 	str := convertStr(strs)
 	bytes := []byte(str)
