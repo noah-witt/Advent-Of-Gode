@@ -17,7 +17,7 @@ func numInArray(num int, list []int) bool {
 
 func generateArray(length int, defaultValue int) []int {
 	result := make([]int, length)
-	for index, _ := range result {
+	for index := range result {
 		result[index] = defaultValue
 	}
 	return result
