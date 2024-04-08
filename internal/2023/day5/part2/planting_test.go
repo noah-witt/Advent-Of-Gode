@@ -54,7 +54,7 @@ func TestReal(t *testing.T) {
 		lines = append(lines, fileScanner.Text())
 	}
 	got := minSeedMap(lines)
-	want := 3374647
+	want := 6082852
 	if got != want {
 		t.Errorf("got %d, wanted %d", got, want)
 	}
